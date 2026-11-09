@@ -4,7 +4,7 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 WINDOW_TITLE = "Racing"
 
-ACCELERATION = 1200
+ACCELERATION = 600
 MAX_SPEED = 400
 FRICTION = 0.99
 
@@ -66,10 +66,13 @@ class Game(arcade.Window):
 
   def on_update(self, delta_time):
     print(self.car.position, self.car.angle)
+    angle_rad = math.radians(self.car.angle)
     speed = math.sqrt(self.car.change_y**2 + self.car.change_x**2)
+    self.car.change_x = speed * math.sin(angle_rad)
+    self.car.change_y = speed * math.cos(angle_rad)
     if self.up_pressed and not self.down_pressed:
-      self.car.change_y += ACCELERATION * delta_time * math.cos(math.radians(self.car.angle))
-      self.car.change_x += ACCELERATION * delta_time * math.sin(math.radians(self.car.angle))
+      self.car.change_y += ACCELERATION * delta_time * math.cos(angle_rad)
+      self.car.change_x += ACCELERATION * delta_time * math.sin(angle_rad)
     elif not self.up_pressed and self.down_pressed:
       self.car.change_y -= ACCELERATION * delta_time
     else:
@@ -77,6 +80,8 @@ class Game(arcade.Window):
       self.car.change_x *= FRICTION
       if abs(self.car.change_y) <= 2:
         self.car.change_y = 0
+      if abs(self.car.change_x) <= 2:
+        self.car.change_x = 0
 
     if self.left_pressed and not self.right_pressed and speed > 0:
       self.car.angle -= speed * ANGLE_CHANGE * delta_time

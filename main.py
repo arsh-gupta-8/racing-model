@@ -8,6 +8,8 @@ ACCELERATION = 1200
 MAX_SPEED = 400
 FRICTION = 0.99
 
+ANGLE_CHANGE = 0.5
+
 class Game(arcade.Window):
 
   def __init__(self):
@@ -63,24 +65,23 @@ class Game(arcade.Window):
 
 
   def on_update(self, delta_time):
-    print(self.car.position)
+    print(self.car.position, self.car.angle)
+    speed = math.sqrt(self.car.change_y**2 + self.car.change_x**2)
     if self.up_pressed and not self.down_pressed:
-      self.car.change_y += ACCELERATION * delta_time
+      self.car.change_y += ACCELERATION * delta_time * math.cos(math.radians(self.car.angle))
+      self.car.change_x += ACCELERATION * delta_time * math.sin(math.radians(self.car.angle))
     elif not self.up_pressed and self.down_pressed:
       self.car.change_y -= ACCELERATION * delta_time
     else:
       self.car.change_y *= FRICTION
+      self.car.change_x *= FRICTION
       if abs(self.car.change_y) <= 2:
         self.car.change_y = 0
 
-    if self.left_pressed and not self.right_pressed:
-      self.car.change_x -= ACCELERATION * delta_time
-    elif not self.left_pressed and self.right_pressed:
-      self.car.change_x += ACCELERATION * delta_time
-    else:
-      self.car.change_x *= FRICTION
-      if abs(self.car.change_x) <= 10:
-        self.car.change_x = 0
+    if self.left_pressed and not self.right_pressed and speed > 0:
+      self.car.angle -= speed * ANGLE_CHANGE * delta_time
+    elif not self.left_pressed and self.right_pressed and speed > 0:
+      self.car.angle += speed * ANGLE_CHANGE * delta_time
 
     if self.car.change_x > MAX_SPEED:
       self.car.change_x = MAX_SPEED 

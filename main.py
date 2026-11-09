@@ -70,7 +70,7 @@ class Game(arcade.Window):
 
     if self.up_pressed and not self.down_pressed and self.car.speed <= MAX_SPEED:
       self.car.speed += ACCELERATION * delta_time
-    elif not self.up_pressed and self.down_pressed and self.car.speed >= -MAX_SPEED/2:
+    elif not self.up_pressed and self.down_pressed and self.car.speed >= -MAX_SPEED / 2:
       self.car.speed -= DECELERATION * delta_time
     else:
       self.car.speed *= FRICTION
@@ -78,10 +78,16 @@ class Game(arcade.Window):
       if abs(self.car.speed) <= 2:
         self.car.speed = 0
 
-    if self.left_pressed and not self.right_pressed and self.car.speed > 0:
-      self.car.angle -= ANGLE_CHANGE * delta_time
-    elif not self.left_pressed and self.right_pressed and self.car.speed > 0:
-      self.car.angle += ANGLE_CHANGE * delta_time
+    if self.left_pressed and not self.right_pressed:
+      if self.car.speed > 0:
+        self.car.angle -= ANGLE_CHANGE * delta_time
+      elif self.car.speed < 0:
+        self.car.angle += ANGLE_CHANGE / 2 * delta_time
+    elif not self.left_pressed and self.right_pressed:
+      if self.car.speed > 0:
+        self.car.angle += ANGLE_CHANGE * delta_time
+      elif self.car.speed < 0:
+        self.car.angle -= ANGLE_CHANGE / 2 * delta_time
 
     self.car.center_x += self.car.speed * math.sin(angle_rad) * delta_time
     self.car.center_y += self.car.speed * math.cos(angle_rad) * delta_time
